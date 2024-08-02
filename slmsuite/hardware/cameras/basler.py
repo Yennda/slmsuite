@@ -2,8 +2,8 @@
 Template for writing a subclass for camera hardware control in :mod:`slmsuite`.
 Outlines which camera superclass functions must be implemented.
 """
-
 from slmsuite.hardware.cameras.camera import Camera
+
 from pypylon import pylon
 
 
@@ -99,12 +99,14 @@ class Basler(Camera):
             tlFactory = pylon.TlFactory.GetInstance()
             devices = tlFactory.EnumerateDevices()
             cameras = pylon.InstantCameraArray(min(len(devices), len(devices)))
+            print("Number of available cameras: ", len(devices))
 
             # prints the list of available cameras
             for i, cam in enumerate(cameras):
                 cam.Attach(tlFactory.CreateDevice(devices[i]))
                 print(i, ". Device ", cam.GetDeviceInfo().GetModelName())
                 print("\tGetDeviceGUID ", cam.GetDeviceInfo().GetDeviceGUID())
+                cam.Close()
 
         serial_list = devices  # TODO: Fill in proper function.
         return serial_list
@@ -126,13 +128,12 @@ class Basler(Camera):
 
     def _get_image_hw(self, timeout_s=1):
         """See :meth:`.Camera._get_image_hw`."""
-        raise NotImplementedError()
         # The core method: grabs an image from the camera.
         # Note: the camera superclass' get_image function performs follow-on processing
         # (similar to how the SLM superclass' write method pairs with _write_hw methods
         # for each subclass) -- frame averaging, transformations, and so on -- so this
         # method should be limited to camera-interface specific functions.
-        return self.cam.GrabOne(timeout_s * 1e6).Array  # TODO: Fill in proper function.
+        return self.cam.GrabOne(int(timeout_s * 1e6)).Array  # TODO: Fill in proper function.
 
     def _get_images_hw(self, timeout_s=1):
         """See :meth:`.Camera._get_images_hw`."""
@@ -145,5 +146,11 @@ class Basler(Camera):
 
     def flush(self):
         """See :meth:`.Camera.flush`."""
-        raise NotImplementedError()
+        pass
+        # raise NotImplementedError()
         # Clears ungrabbed images from the queue
+    def close(self):
+        self.cam.Close()
+
+if __name__ == "__main__":
+    Basler.info()

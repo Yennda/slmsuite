@@ -4,7 +4,9 @@ Outlines which SLM superclass functions must be implemented.
 """
 from .slm import SLM
 import EXULUS_COMMAND_LIB as sdk
-from thorlabs_fullscreen import send_to_slm
+from .thorlabs_fullscreen import SlmScreen
+
+
 class Thorlabs(SLM):
     """
     Template for implementing a new SLM subclass. Replace :class:`Template`
@@ -13,11 +15,12 @@ class Thorlabs(SLM):
     """
 
     def __init__(
-        self,
-        bitdepth=8,
-        wav_um=0.633,
-        pitch_um=(8,8),
-        **kwargs
+            self,
+            bitdepth=8,
+            wav_um=0.633,
+            pitch_um=(8, 8),
+            display_number = 2,
+            **kwargs
     ):
         r"""
         Initialize SLM and attributes.
@@ -42,6 +45,7 @@ class Thorlabs(SLM):
 
         width = 1920
         height = 1200
+        self.display_number = int(display_number)
 
         # Mandatory functions:
         # - Opening a connection to the device.
@@ -49,19 +53,18 @@ class Thorlabs(SLM):
         devs = sdk.EXULUSListDevices()
         print(devs)
         if (len(devs) <= 0):
-            raise('There is no devices connected')
+            raise ModuleNotFoundError('There is no devices connected')
         else:
             EXULUS = devs[0]
             serialNumber = EXULUS[0]
 
-            hdl = sdk.EXULUSOpen(serialNumber, 38400, 3)
+            self.hdl = sdk.EXULUSOpen(serialNumber, 38400, 3)
 
-            if (hdl < 0):
+            if (self.hdl < 0):
                 print("Connect ", serialNumber, "fail")
                 return -1
             else:
                 print("Connect ", serialNumber, "successfully")
-
 
         # Other possibilities to consider:
         # - Setting the SLM's operating wavelength (wav_um).
@@ -80,9 +83,10 @@ class Thorlabs(SLM):
             pitch_um=pitch_um,
             **kwargs
         )
+        self.screen = SlmScreen(display_number)
 
         # Zero the display using the superclass `write()` function.
-        self.write(None)
+        # self.write(None)
 
     @staticmethod
     def info(verbose=True):
@@ -100,8 +104,14 @@ class Thorlabs(SLM):
         list of str
             List of serial numbers or identifiers.
         """
-        raise NotImplementedError()
-        serial_list = get_serial_list()     # TODO: Fill in proper function.
+        devs = sdk.EXULUSListDevices()
+        if (len(devs) <= 0):
+            print('There is no devices connected')
+        else:
+            EXULUS = devs[0]
+            serialNumber = EXULUS[0]
+
+        serial_list = devs  # TODO: Fill in proper function.
         return serial_list
 
     def _write_hw(self, phase):
@@ -111,5 +121,8 @@ class Thorlabs(SLM):
         :class:`.SLM`, ``phase`` is error checked before calling
         :meth:`_write_hw()`. See :meth:`.SLM._write_hw` for further detail.
         """
-        send_to_slm(phase)
-        # TODO: Insert code here to write raw phase data to the SLM.
+        self.screen.send(phase)
+
+    def close(self):
+        self.screen.close()
+        sdk.EXULUSClose(self.hdl)

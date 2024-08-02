@@ -395,6 +395,33 @@ class Santec(SLM):
                 real = cv2.GaussianBlur(real, (size_blur, size_blur), 0)
                 imag = cv2.GaussianBlur(imag, (size_blur, size_blur), 0)
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
                 # Recombine the components
                 phase = np.arctan2(imag, real) + np.pi
 

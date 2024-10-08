@@ -40,6 +40,12 @@ Install the latest version of `slmsuite` from GitHub using:
 pip install git+https://github.com/slmsuite/slmsuite
 ```
 
+Install the latest version of `cuda` for GPU-acceleration from Nvidia using:
+
+```console
+conda install cuda -c nvidia 
+```
+
 ## Documentation and Examples
 
 Extensive

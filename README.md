@@ -26,7 +26,7 @@
 - [Toolboxes for structured light](https://slmsuite.readthedocs.io/en/latest/_examples/structured_light.html#), imprinting sectioned phase masks, SLM unit conversion, padding and unpadding data, and more
 - A fully-featured [example library](https://slmsuite.readthedocs.io/en/latest/examples.html) that demonstrates these and other features
 
-## Installation
+## Installation - pip
 
 Install the stable version of `slmsuite` from [PyPI](https://pypi.org/project/slmsuite/) using:
 
@@ -40,10 +40,25 @@ Install the latest version of `slmsuite` from GitHub using:
 pip install git+https://github.com/slmsuite/slmsuite
 ```
 
+## Installation - conda (Recommonded)
+
 Install the latest version of `cuda` for GPU-acceleration from Nvidia using:
 
 ```console
 conda install cuda -c nvidia 
+```
+
+Install `cuda toolkit` from https://developer.nvidia.com/cuda-toolkit.
+Download and install `slmsuite` using:
+
+```console
+conda env update --file environment.yml 
+```
+
+To activate this environment, use
+
+```console
+conda activate slm
 ```
 
 ## Documentation and Examples
